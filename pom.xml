@@ -87,9 +87,6 @@
 			<version>${online.judge.version}</version>
 		</dependency>
 
-
-
-		
 	</dependencies>
 
 	<build>

@@ -12,14 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import onlinejudge.OnlinejudgeMSUserApplication;
 import onlinejudge.domain.User;
 import onlinejudge.dto.MyResponse;
 import onlinejudge.user.service.UserService;
 
 @Controller
 public class UserController {
-	 private final Logger logger = LoggerFactory.getLogger(OnlinejudgeMSUserApplication.class);
+	 private final Logger logger = LoggerFactory.getLogger(UserController.class);
 	@Autowired
 	UserService userService;
 	
