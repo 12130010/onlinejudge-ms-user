@@ -19,40 +19,10 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends ResourceServerConfigurerAdapter{
-	@Autowired
-	private Environment env;
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
 				.antMatchers("/" , "/about", "/users").permitAll()
 				.anyRequest().authenticated();
 	}
-	@Primary
-	@Bean
-	public RemoteTokenServices tokenService() {
-	    RemoteTokenServices tokenService = new RemoteTokenServices();
-	    tokenService.setCheckTokenEndpointUrl(
-	    		env.getProperty("onlinejudge.ms.user.checkToken"));
-	    tokenService.setClientId(env.getProperty("onlinejudge.ms.user.id"));
-	    tokenService.setClientSecret(env.getProperty("onlinejudge.ms.user.password"));
-	    tokenService.setRestTemplate(restTemplate());
-	    return tokenService;
-	}
-	
-	@LoadBalanced
-    @Bean
-    public RestTemplate restTemplate() {
-		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
-			@Override
-			// Ignore 400
-			public void handleError(ClientHttpResponse response) throws IOException {
-				if (response.getRawStatusCode() != 400) {
-					super.handleError(response);
-				}
-			}
-		});
-        return restTemplate;
-    }
-
 }
