@@ -1,6 +1,8 @@
 package onlinejudge.user.controller;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import onlinejudge.domain.User;
 import onlinejudge.dto.MyResponse;
+import onlinejudge.mail.sender.OnlineJudgeMailSender;
 import onlinejudge.message.util.MessageSourceUtil;
 import onlinejudge.user.service.UserService;
 
@@ -33,6 +36,9 @@ public class UserController implements MessageSourceAware{
 	 
 	@Autowired
 	UserService userService;
+	
+	@Autowired
+	OnlineJudgeMailSender onlineJudgeMailSender;
 	
 	@RequestMapping({"/","/about"})
 	public @ResponseBody String about(){
@@ -54,10 +60,18 @@ public class UserController implements MessageSourceAware{
 		MyResponse myResponse = null;
 		ResponseEntity<MyResponse> response = null;
 		try {
-			user = userService.createUser(user);
+//			user = userService.createUser(user);
+			userService.createUser(user);
 			myResponse = MyResponse.builder().success().build();
 			response = new ResponseEntity<MyResponse>(myResponse, HttpStatus.OK);
 			//TODO validate user information
+			
+			//send mail
+			new Thread(){
+				public void run() {
+					onlineJudgeMailSender.sendMail(user.getEmail(), "Register account on OnlineJudge success!", "Register account on OnlineJudge success!\nThank you!");
+				};
+			}.start();
 			logger.info("Create user success! - User: " + user.getEmail());
 		} catch (Exception e) {
 			myResponse = MyResponse.builder().fail().setObj(e.getMessage()).build();
@@ -130,6 +144,26 @@ public class UserController implements MessageSourceAware{
 			response = new ResponseEntity<User>(user, HttpStatus.OK);
 		}
 		return user;
+	}
+	
+	/**
+	 * TODO Document
+	 * @param username
+	 * @return
+	 */
+	@RequestMapping("/checkUserIsExist")
+	public @ResponseBody ResponseEntity<Map<String, String>> checkUserExist(@RequestParam String username){
+		Map<String, String> result = new HashMap<>();
+		
+		User user = userService.getUserByEmail(username);
+		
+		if(user == null){
+			result.put("isExist", "false");
+		}else{
+			result.put("isExist", "true");
+		}
+		
+		return new ResponseEntity<Map<String,String>>(result, HttpStatus.OK);
 	}
 	
 	@Override

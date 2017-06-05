@@ -11,7 +11,7 @@ public class WebSecurityConfig extends ResourceServerConfigurerAdapter{
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
-				.antMatchers("/" , "/about", "/users").permitAll()
+				.antMatchers("/" , "/about", "/users", "/checkUserIsExist").permitAll()
 				.anyRequest().authenticated();
 	}
 }
